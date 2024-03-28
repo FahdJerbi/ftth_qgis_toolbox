@@ -162,12 +162,6 @@ class GnsFtthToolbox:
 
         return action
 
-    # def initGui(self):
-    #     icon = os.path.join(os.path.join(cmd_folder, "icon.png"))
-    #     self.action = QAction(QIcon(icon), "Load Basemap", self.iface.mainWindow())
-    #     self.iface.addToolBarIcon(self.action)
-    #     self.action.triggered.connect(self.run)
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
@@ -184,14 +178,13 @@ class GnsFtthToolbox:
         # my actions
         self.dlg.CreateSchemaBtn.clicked.connect(self.run_sql)
 
-        # get input text
-        # self.dlg.GnsProjectSettingsNameInput.text
-
         # will be set False in run()
         self.first_start = True
 
     def run_sql(self):
-        print("button is working")
+        # get input text 'Project Name'
+        text_input = self.dlg.GnsProjectNameInput.text()
+        print(f"button is working {text_input}")
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""

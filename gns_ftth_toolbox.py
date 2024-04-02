@@ -32,6 +32,7 @@ from .resources import *
 from .gns_ftth_toolbox_dialog import GnsFtthToolboxDialog
 import os.path
 import inspect  #!: learn about this usefull module!!
+from .my_functions import get_connections
 
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
 
@@ -170,16 +171,53 @@ class GnsFtthToolbox:
 
         self.add_action(
             icon_path,
-            text=self.tr(""),
+            text=self.tr("GNS FTTH Toolbox"),
             callback=self.run,
             parent=self.iface.mainWindow(),
         )
 
-        # my actions
+        # my signals
         self.dlg.CreateSchemaBtn.clicked.connect(self.run_sql)
 
         # will be set False in run()
         self.first_start = True
+
+    # # get QSettings PostgreSQL/connections group
+    # def get_connections(self):
+    #     db_connection_key_names = [
+    #         "authcfg",
+    #         "database",
+    #         "host",
+    #         "password",
+    #         "port",
+    #         "service",
+    #         "sslmode",
+    #         "username",
+    #         "connection_name",
+    #     ]
+
+    #     conn_name = {}
+    #     # get postgres db connections
+    #     settings = QSettings()
+    #     pgsql_grp = "PostgreSQL/connections"
+    #     settings.beginGroup(pgsql_grp)
+    #     dbs = settings.childGroups()  # dbs connected to QGIS (list)
+    #     for db in dbs:
+    #         temp_dict = {}
+    #         pgsql_grp = "PostgreSQL/connections"
+    #         settings.beginGroup(f"{pgsql_grp}/ {db}")
+    #         db_info = settings.childKeys()  # db parameters (e.g.: port, hostname,..)
+    #         for db_params in db_connection_key_names:
+    #             if db_params in db_info:
+    #                 temp_dict[db_params] = settings.values(db_params)
+    #             elif db_params == "connection_name":
+    #                 temp_dict[db_params] = db
+    #                 # print(temp_dict)
+    #                 conn_name[db] = temp_dict
+    #             # print(conn_name)
+    #     self.dlg.DBcomboBox.clear()
+    #     self.dlg.DBcomboBox.addItems(list(conn_name))
+    #     # print(self.conn_name)
 
     def run_sql(self):
         # get input text 'Project Name'
@@ -194,6 +232,8 @@ class GnsFtthToolbox:
 
     def run(self):
         """Run method that performs all the real work"""
+        # get database connections upon plugin activation
+        self.get_connections()
 
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started

@@ -250,3 +250,37 @@ class GnsFtthToolbox:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+
+# -----------------------------------------    it works   -----------------------
+# from qgis.PyQt.QtSql import QSqlDatabase, QSqlQuery
+
+
+# #db= QSqlDatabase.database()
+
+# db = QSqlDatabase.addDatabase("QPSQL")
+# db.setHostName("postgres")
+# db.setDatabaseName("ftth_db")
+# db.setUserName("postgres")
+# db.setPassword("0000")
+# db.open()
+
+# query_obj = QSqlQuery()
+
+# name = 'testschema'
+
+# query_obj.exec_(f'CREATE SCHEMA IF NOT EXISTS "{name}";')
+# ----------------------------------------------------------------
+
+
+# ------------------------------------   this works too  ----------------------------
+# from PyQt5.QtSql import *
+
+# db = QSqlDatabase.addDatabase("QPSQL")
+# db.setHostName("localhost")
+# db.setDatabaseName("ftth_db")
+# db.setUserName("postgres")
+# db.setPassword("0000")
+# db.open()
+# names=db.tables(QSql.Tables)
+# print(names)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>423</width>
-    <height>469</height>
+    <width>371</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,13 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="GnsProjectSettingsDescLabel">
+           <property name="text">
+            <string>Description:</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="GnsProjectNameInput">
            <property name="inputMask">
@@ -50,13 +57,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="GnsProjectSettingsDescLabel">
-           <property name="text">
-            <string>Description:</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -71,11 +71,23 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QLabel" name="GnsDbConnectionLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>290</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
            </property>
            <property name="text">
             <string>Connection Name:</string>
@@ -91,22 +103,25 @@
       <item row="2" column="0">
        <widget class="QGroupBox" name="GnsSchemaManagementGroup">
         <property name="title">
-         <string>Schema Management</string>
+         <string>Project Management</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="CreateSchemaBtn">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="2" column="0">
+          <widget class="QPushButton" name="CreateProjectBtn">
            <property name="text">
-            <string>Create Schema/Template</string>
+            <string>Create Project Template</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QPushButton" name="CreateProjectBtn">
+          <widget class="QPushButton" name="CreateSchemaBtn">
            <property name="text">
-            <string>Create Project File</string>
+            <string>Create Schema/Shapefiles</string>
            </property>
           </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QComboBox" name="SchemacomboBox"/>
          </item>
         </layout>
        </widget>

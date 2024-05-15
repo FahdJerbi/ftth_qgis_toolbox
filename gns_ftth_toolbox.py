@@ -25,6 +25,7 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtSql import QSqlDatabase, QSqlQuery
+from qgis.core import QgsProject, QgsDataSourceUri, QgsVectorLayer
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -33,7 +34,7 @@ from .resources import *
 from .gns_ftth_toolbox_dialog import GnsFtthToolboxDialog
 import os.path
 import inspect  #!: learn about this usefull module!!
-from .my_functions import get_connections
+from .my_functions import get_connections, get_schema_list
 
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
 
@@ -180,6 +181,7 @@ class GnsFtthToolbox:
         # my signals
         # self.dlg.CreateSchemaBtn.clicked.connect(self.run_sql)
         self.dlg.CreateSchemaBtn.clicked.connect(self.create_schema)
+        self.dlg.CreateProjectBtn.clicked.connect(self.create_project)
 
         # will be set False in run()
         self.first_start = True
@@ -199,10 +201,15 @@ class GnsFtthToolbox:
 
         schema_query = f"""CREATE SCHEMA IF NOT EXISTS {text_input};
                             SET search_path TO {text_input}, public;
-                            CREATE TABLE {text_input}.pt(
+                            CREATE TABLE {text_input}.mfg(
                                 id SERIAL PRIMARY KEY NOT NULL,
                                 name VARCHAR(5),
-                                geom geometry(Point, 2532));"""
+                                geom geometry(Point, 2532));
+                            CREATE TABLE {text_input}.duct(
+                                id SERIAL PRIMARY KEY NOT NULL,
+                                name VARCHAR(5),
+                                geom geometry(Linestring, 2532));
+                                """
 
         query_obj = QSqlQuery()  # create an empty object, DON'T PASS ANY PARAMS !!
         if not query_obj.exec_(schema_query):
@@ -225,6 +232,7 @@ class GnsFtthToolbox:
         """Run method that performs all the real work"""
         # get database connections upon plugin activation
         get_connections(self)
+        get_schema_list(self)
 
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
@@ -242,59 +250,42 @@ class GnsFtthToolbox:
             # substitute with your code.
             pass
 
+    def create_project(self):
+        # TODO: if database choice have changed, then search for its related schema list !!
 
-# -----------------------------------------    it works   -----------------------
-# from qgis.PyQt.QtSql import QSqlDatabase, QSqlQuery
+        # get schema name from user
+        user_schema_name = self.dlg.SchemacomboBox.currentText()
+        geom = "geom"
 
+        # get database uri
+        db_uri = QgsDataSourceUri()  # create an empty instance
+        db_uri.setConnection(
+            "localhost", "5432", "ftth_db", "postgres", "0000"
+        )  # host_name, port, db_name, owner, password
 
-# #db= QSqlDatabase.database()
+        # create layer tree groups:
+        layer_panel = QgsProject.instance().layerTreeRoot()
+        node_group = layer_panel.addGroup("Node")
+        arc_group = layer_panel.addGroup("Arc")
 
-# db = QSqlDatabase.addDatabase("QPSQL")
-# db.setHostName("postgres")
-# db.setDatabaseName("ftth_db")
-# db.setUserName("postgres")
-# db.setPassword("0000")
-# db.open()
+        ftth_db_layers = [
+            "dp",
+            "mfg",
+            "duct",
+            "drop_cable",
+        ]  # loop through layers in db
+        layers = []
 
-# query_obj = QSqlQuery()
+        db_schema = "too"
 
-# name = 'testschema'
+        for x in ftth_db_layers:
+            db_uri.setDataSource(user_schema_name, x, geom)
+            db_layers = QgsVectorLayer(db_uri.uri(False), x, "postgres")
 
-# query_obj.exec_(f'CREATE SCHEMA IF NOT EXISTS "{name}";')
-# ----------------------------------------------------------------
+            if db_layers.wkbType() == 1:
+                node_group.addLayer(db_layers)
+            elif db_layers.wkbType() == 2:
+                arc_group.addLayer(db_layers)
 
-
-# ------------------------------------   this works too  ----------------------------
-# from PyQt5.QtSql import *
-
-# db = QSqlDatabase.addDatabase("QPSQL")
-# db.setHostName("localhost")
-# db.setDatabaseName("ftth_db")
-# db.setUserName("postgres")
-# db.setPassword("0000")
-# db.open()
-# names=db.tables(QSql.Tables)
-# print(names)
-
-###------------------------- it works !! 7md !!
-# from qgis.PyQt.QtSql import QSqlDatabase, QSqlQuery
-# db = QSqlDatabase().addDatabase("QPSQL")
-# db.setHostName("localhost")
-# db.setDatabaseName("ftth_db")
-# db.setUserName("postgres")
-# db.setPassword("0000")
-# db.open()
-
-#         # my schema query
-# schema_name = "me"
-# schema_query = """CREATE SCHEMA IF NOT EXISTS me;
-# SET search_path TO me, public;
-# CREATE TABLE me.pt(
-#     id SERIAL PRIMARY KEY NOT NULL,
-#     name VARCHAR(5),
-#     geom geometry(Point, 2532));"""
-
-# #for q in schema_query:
-# query_obj = QSqlQuery()
-# if not query_obj.exec_(schema_query):
-#     print("text error" + query_obj.lastError().text())
+        # print("Layers added successfully !")
+        print("create_project function !")

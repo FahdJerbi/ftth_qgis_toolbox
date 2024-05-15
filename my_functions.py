@@ -1,4 +1,32 @@
 from qgis.PyQt.QtCore import QSettings
+from qgis.core import QgsProject, QgsDataSourceUri
+from qgis.PyQt.QtSql import QSqlDatabase, QSqlQuery
+
+
+# create the "create_project_structure()" callback function
+# then add it as a parameter to "get_connections()"
+# def create_project(self):
+
+#     # get schema name from user
+#     user_schema_name = self.dlg.GnsProjectNameInput.text()
+#     geom = "geom"
+
+#     # get database uri
+#     db_uri = QgsDataSourceUri()  # create an empty instance
+#     db_uri.setConnection()  # host_name, port, db_name, owner, password
+
+#     # create groups:
+#     layer_panel = QgsProject.instance().layerTreeRoot()
+#     node_group = layer_panel.addGroup("Node")
+#     arc_group = layer_panel.addGroup("Arc")
+
+#     ftth_db_layers = ["dp", "mfg", "duct", "drop_cable"]
+
+#     print("create_project function !")
+
+
+# TODO: create "get_schema()" function:
+# TODO: create "get_db_config()" function:
 
 
 # get QSettings PostgreSQL/connections group
@@ -37,3 +65,74 @@ def get_connections(self):
     self.dlg.DBcomboBox.clear()
     self.dlg.DBcomboBox.addItems(list(conn_name))
     # print(self.conn_name)
+
+
+# from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+
+# def get_schema_names(host, port, user, password, database):
+#     # Initialize the database connection
+#     db = QSqlDatabase.addDatabase("QPSQL")
+#     db.setHostName(host)
+#     db.setPort(port)
+#     db.setUserName(user)
+#     db.setPassword(password)
+#     db.setDatabaseName(database)
+
+#     # Open the database connection
+#     if not db.open():
+#         print("Error:", db.lastError().text())
+#         return []
+
+#     # Execute SQL query to fetch schema names
+#     query = QSqlQuery()
+#     query.exec_("SELECT schema_name FROM information_schema.schemata;")
+
+#     # Extract schema names from the result set
+#     schema_names = []
+#     while query.next():
+#         schema_names.append(query.value(0))
+
+#     # Close the database connection
+#     db.close()
+
+#     return schema_names
+
+# # Example usage:
+# host = 'your_host'
+# port = 'your_port'
+# user = 'your_username'
+# password = 'your_password'
+# database = 'your_database'
+
+# schema_names = get_schema_names(host, port, user, password, database)
+# print("Schema Names:", schema_names)
+
+
+def get_schema_list(self):
+
+    db = QSqlDatabase.addDatabase("QPSQL")
+    db.setDatabaseName("ftth_db")
+    db.setHostName("localhost")
+    db.setPort(5432)
+    db.setPassword("0000")
+    db.setUserName("postgres")
+
+    # if not db.isOpen():
+    #     print("something is wrong ")
+    #     return []
+
+    db.open()
+    query = QSqlQuery()
+    query.exec_(
+        """SELECT schema_name FROM information_schema.schemata WHERE schema_name != 'information_schema' """
+    )
+
+    schema_list = []
+    while query.next():
+        schema_list.append(query.value(0))
+
+    db.close()
+
+    print("function is working !")
+
+    self.dlg.SchemacomboBox.addItems(schema_list)

@@ -21,7 +21,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtSql import QSqlDatabase, QSqlQuery
@@ -57,6 +57,7 @@ class GnsFtthToolbox:
 
         # my dialog
         self.dlg = GnsFtthToolboxDialog()
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # initialize locale
         locale = QSettings().value("locale/userLocale")[0:2]
